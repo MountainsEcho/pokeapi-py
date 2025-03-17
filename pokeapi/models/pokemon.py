@@ -1,22 +1,41 @@
 from __future__ import annotations
 from pydantic import BaseModel, Field
+import importlib
 from typing import TYPE_CHECKING
 
+from .common import (
+    NamedAPIResource,
+    APIResource,
+    Name,
+    VerboseEffect,
+    Effect,
+    Description,
+    FlavorText,
+    VersionDetailEncounter,
+    VersionGameIndex,
+    GenerationGameIndex,
+)
+
+# needed to avoid circular imports
 if TYPE_CHECKING:
-    from .common import (
-        NamedAPIResource,
-        APIResource,
-        Name,
-        VerboseEffect,
-        Effect,
-        Description,
-        FlavorText,
-        VersionDetailEncounter,
-        VersionGameIndex,
-        GenerationGameIndex,
-    )
     from .games import Generation
     from .moves import Move
+
+
+def _get_generation() -> "Generation":
+    """
+    Get the Generation model class. Needed to avoid circular imports.
+    """
+    games = importlib.import_module("pokeapi.models.games")
+    return games.Generation
+
+
+def _get_move() -> "Move":
+    """
+    Get the Move model class. Needed to avoid circular imports.
+    """
+    moves = importlib.import_module("pokeapi.models.moves")
+    return moves.Move
 
 
 class Ability(BaseModel):
@@ -782,6 +801,11 @@ class Type(BaseModel):
     moves: list["Move"] = \
         Field(default_factory=list,
               description="A list of moves that have this type.")
+
+    def __init__(self, **data) -> None:
+        super().__init__(**data)
+        self.generation = _get_generation()
+        self.moves = [_get_move()(**move) for move in self.moves]
 
 
 class TypePokemon(BaseModel):

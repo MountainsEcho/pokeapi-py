@@ -1,17 +1,26 @@
 from __future__ import annotations
 from pydantic import BaseModel, Field
+import importlib
 from typing import TYPE_CHECKING
 
+from .common import (
+    NamedAPIResource,
+    APIResource,
+    Name,
+    VerboseEffect,
+    MachineVersionDetail,
+    Description,
+)
+
 if TYPE_CHECKING:
-    from .common import (
-        NamedAPIResource,
-        APIResource,
-        Name,
-        VerboseEffect,
-        MachineVersionDetail,
-        Description,
-    )
     from .pokemon import AbilityEffectChange
+
+# lazy import to avoid circular import
+
+
+def _get_ability_effect_change() -> "AbilityEffectChange":
+    pokemon = importlib.import_module("pokeapi.models.pokemon")
+    return pokemon.AbilityEffectChange
 
 
 class Move(BaseModel):
@@ -83,6 +92,11 @@ class Move(BaseModel):
     type: "NamedAPIResource" = Field(
         description="The type of damage the move inflicts on the target.",
     )
+
+    def __init__(self, **data) -> None:
+        super().__init__(**data)
+        self.effect_changes = [_get_ability_effect_change()()
+                               for _ in self.effect_changes]
 
 
 class ContestComboSets(BaseModel):
