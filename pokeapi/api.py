@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import Optional, Union, overload
 import logging
+from rich import print
 
 import requests
 
@@ -64,24 +65,30 @@ class Api:
 
         self._version = version
 
+    def _make_request(self, url: str, params: dict) -> requests.Response:
+        """
+        Makes a request to the API.
+        """
+        try:
+            response = self.session.get(url, params=params)
+            # Check if the response was successful
+            response.raise_for_status()
+        except requests.HTTPError as e:
+            logging.error(f"Error fetching data from API: {e}")
+            raise
+
+        return response
+
     def get_berry(
         self, *,
         id: Optional[int] = None,
         name: Optional[str] = None,
-        offset: Optional[int] = None,
-        limit: Optional[int] = None
     ) -> "Berry":
         """
         Returns a Berry object from the API.
         """
 
         params = {}
-
-        if isinstance(offset, int):
-            params["offset"] = offset
-
-        if isinstance(limit, int):
-            params["limit"] = limit
 
         if id is not None:
             if not isinstance(id, int):
@@ -112,3 +119,49 @@ class Api:
             raise
 
         return Berry.model_validate(response.json())
+
+    def get_all_berries(
+        self, *,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+    ) -> list["NamedAPIResource"]:
+        """
+        Returns a BerryList object from the API.
+        """
+
+        params = {}
+
+        if limit is not None:
+            if not isinstance(limit, int):
+                raise TypeError("limit must be an integer")
+            elif limit < 1:
+                raise ValueError("limit must be greater than 0")
+            params["limit"] = limit
+
+        if offset is not None:
+            if not isinstance(offset, int):
+                raise TypeError("offset must be an integer")
+            elif offset < 0:
+                raise ValueError("offset must be greater than or equal to 0")
+            params["offset"] = offset
+
+        url = f"{self.url}/berry/"
+
+        try:
+            response = self.session.get(url, params=params)
+            # Check if the response was successful
+            response.raise_for_status()
+        except requests.HTTPError as e:
+            logging.error(f"Error fetching data from API: {e}")
+            raise
+
+        model = NamedAPIResourceList.model_validate(response.json())
+
+        BerryList: list["NamedAPIResource"] = []
+
+        while model.next:
+            response = self.session.get(model.next)
+            BerryList = NamedAPIResourceList.model_validate(response.json())
+            print(BerryList)
+
+        return NamedAPIResourceList.model_validate(response.json())

@@ -805,7 +805,8 @@ class Type(BaseModel):
     def __init__(self, **data) -> None:
         super().__init__(**data)
         self.generation = _get_generation()
-        self.moves = [_get_move()(**move) for move in self.moves]
+        self.moves = [_get_move()(**move)  # type: ignore
+                      for move in self.moves]
 
 
 class TypePokemon(BaseModel):

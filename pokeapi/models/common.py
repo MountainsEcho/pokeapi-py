@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Optional
 from pydantic import BaseModel, Field
 
 
@@ -21,8 +22,10 @@ class NamedAPIResourceList(BaseModel):
     for more details.
 
     Attributes:
-        name (str): The name of the resource.
-        url (str): The URL of the resource.
+        count (int): The total number of resources available from this API.
+        next (Optional[str]): The URL for the next page in the list.
+        previous (Optional[str]): The URL for the previous page in the list.
+        results (list[NamedAPIResource]): A list of named API resources.
 
     Example:
         ```
@@ -42,10 +45,10 @@ class NamedAPIResourceList(BaseModel):
     count: int = Field(
         description="The total number of resources available from this API."
     )
-    next: str = Field(
+    next: Optional[str] = Field(
         description="The URL for the next page in the list."
     )
-    previous: str = Field(
+    previous: Optional[str] = Field(
         description="The URL for the previous page in the list."
     )
     results: list["NamedAPIResource"] = Field(

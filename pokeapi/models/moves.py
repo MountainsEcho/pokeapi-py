@@ -1,7 +1,7 @@
 from __future__ import annotations
 from pydantic import BaseModel, Field
 import importlib
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Type
 
 from .common import (
     NamedAPIResource,
@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 # lazy import to avoid circular import
 
 
-def _get_ability_effect_change() -> "AbilityEffectChange":
+def _get_ability_effect_change() -> Type["AbilityEffectChange"]:
     pokemon = importlib.import_module("pokeapi.models.pokemon")
     return pokemon.AbilityEffectChange
 
@@ -95,8 +95,8 @@ class Move(BaseModel):
 
     def __init__(self, **data) -> None:
         super().__init__(**data)
-        self.effect_changes = [_get_ability_effect_change()()
-                               for _ in self.effect_changes]
+        self.effect_changes = [_get_ability_effect_change()()  # type: ignore
+                               for effect_change in self.effect_changes]
 
 
 class ContestComboSets(BaseModel):

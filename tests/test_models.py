@@ -1,5 +1,6 @@
 from typing import Optional
 import pytest
+from rich import print
 
 from pokeapi import models
 from pokeapi.api import Api
@@ -24,7 +25,7 @@ def api() -> Api:
         (None, "cheri", models.Berry),
     ]
 )
-def test_berries_api(
+def test_get_berry_by_id(
     api: "Api",
     id: Optional[int],
     name: Optional[str],
@@ -41,3 +42,34 @@ def test_berries_api(
 
     expected = api.get_berry(id=id, name=name)
     assert isinstance(expected, models.Berry)
+
+
+@pytest.mark.parametrize(
+    [
+        "limit",
+        "offset",
+    ],
+    [
+        (None, None),
+        (5, 0),
+        (100, 0),
+    ]
+)
+def test_get_all_berries(
+    api: "Api",
+    limit: Optional[int],
+    offset: Optional[int],
+) -> None:
+    """
+    Testing the berries API.
+
+    api (Api): The API instance.
+    limit (Optional[int]): The limit of the berries.
+    offset (Optional[int]): The offset of the berries.
+    """
+
+    berries = api.get_all_berries(limit=limit, offset=offset)
+    print(berries)
+    assert isinstance(berries, models.NamedAPIResourceList)
+    assert len(berries.results) <= limit
+    assert berries.count > 0
