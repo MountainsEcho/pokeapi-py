@@ -13,12 +13,12 @@ class Api:
     """
 
     def __init__(self, *,
-                 version: str = "v2",):
+                 version: str = "v2"):
         """
         Initializes the Api class.
         """
-        self.version = version
         self.session = self._ensure_session()
+        self.version = version
 
     def _ensure_session(self) -> requests.Session:
         """
@@ -41,7 +41,7 @@ class Api:
         Returns the full URL of the API.
         The URL is constructed using the base URL and the version.
         """
-        return f"{self.base_url}/{self.version}/"
+        return f"{self.base_url}/{self.version}"
 
     @property
     def version(self) -> str:
@@ -62,7 +62,7 @@ class Api:
         if version.startswith("/"):
             raise ValueError("version cannot start with '/'")
 
-        self._version = f"/{version}"
+        self._version = version
 
     def get_berry(
         self, *,
