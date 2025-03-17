@@ -1,17 +1,22 @@
 from __future__ import annotations
 from pydantic import BaseModel, Field
+from typing import TYPE_CHECKING
 
-from .common import (
-    NamedAPIResource,
-    APIResource,
-    Name,
-    VerboseEffect,
-    Effect,
-    Description,
-    FlavorText,
-    VersionDetailEncounter,
-    VersionGameIndex,
-)
+if TYPE_CHECKING:
+    from .common import (
+        NamedAPIResource,
+        APIResource,
+        Name,
+        VerboseEffect,
+        Effect,
+        Description,
+        FlavorText,
+        VersionDetailEncounter,
+        VersionGameIndex,
+        GenerationGameIndex,
+    )
+    from .games import Generation
+    from .moves import Move
 
 
 class Ability(BaseModel):
@@ -690,4 +695,135 @@ class PokemonSpeciesVariety(BaseModel):
     )
     pokemon: "NamedAPIResource" = Field(
         description="The Pokémon variety."
+    )
+
+
+class Stat(BaseModel):
+    id: int = Field(description="The identifier for this resource.")
+    name: str = Field(description="The name for this resource.")
+    game_index: int = Field(
+        description="The identifier for this resource in game indices."
+    )
+    is_battle_only: bool = Field(
+        description="Whether this stat only exists within a battle."
+    )
+    affecting_moves: "MoveStatAffectSets" = Field(
+        description="A detail of moves which affect this stat positively or negatively."
+    )
+    affecting_natures: "NatureStatAffectSets" = Field(
+        description="A detail of natures which affect this stat positively or negatively."
+    )
+    characteristics: list["APIResource"] = Field(
+        default_factory=list,
+        description="A list of characteristics that are set on a Pokémon when its highest base stat is this stat."
+    )
+    move_damage_class: "NamedAPIResource" = Field(
+        description="The class of damage this stat is directly related to."
+    )
+    names: list["Name"] = Field(
+        default_factory=list,
+        description="The name of this resource listed in different languages."
+    )
+
+
+class MoveStatAffectSets(BaseModel):
+    increase: list["MoveStatAffect"] = Field(
+        default_factory=list,
+        description="A list of moves and how they change the referenced stat."
+    )
+    decrease: list["MoveStatAffect"] = Field(
+        default_factory=list,
+        description="A list of moves and how they change the referenced stat."
+    )
+
+
+class MoveStatAffect(BaseModel):
+    change: int = Field(
+        description="The amount of change."
+    )
+    move: "NamedAPIResource" = Field(
+        description="The move being referenced."
+    )
+
+
+class NatureStatAffectSets(BaseModel):
+    increase: list["NamedAPIResource"] = Field(
+        default_factory=list,
+        description="A list of natures and how they change the referenced stat."
+    )
+    decrease: list["NamedAPIResource"] = Field(
+        default_factory=list,
+        description="A list of nature sand how they change the referenced stat."
+    )
+
+
+class Type(BaseModel):
+    """
+    A type of Pokémon, which determines its strengths and weaknesses against other types.
+    """
+    id: int = Field(description="The identifier for this resource.")
+    name: str = Field(description="The name for this resource.")
+    damage_relations: "TypeRelations" = Field(
+        description="The damage relations of this type.")
+    past_damage_relations: list["TypePastRelations"] = \
+        Field(default_factory=list,
+              description="The past damage relations of this type.")
+    game_indices: list["GenerationGameIndex"] = \
+        Field(default_factory=list,
+              description="The game indices of this type.")
+    generation: "Generation" = \
+        Field(description="The generation this type was introduced in.")
+    names: list["Name"] = Field(
+        default_factory=list,
+        description="The name of this resource listed in different languages.")
+    pokemon: list["TypePokemon"] = \
+        Field(default_factory=list,
+              description="A list of Pokémon that have this type.")
+    moves: list["Move"] = \
+        Field(default_factory=list,
+              description="A list of moves that have this type.")
+
+
+class TypePokemon(BaseModel):
+    slot: int = Field(
+        description="The order the Pokémon's types are listed in."
+    )
+    pokemon: "NamedAPIResource" = Field(
+        description="The Pokémon that has the referenced type."
+    )
+
+
+class TypeRelations(BaseModel):
+    no_damage_to: list["NamedAPIResource"] = Field(
+        default_factory=list,
+        description="A list of types this type has no effect on."
+    )
+    half_damage_to: list["NamedAPIResource"] = Field(
+        default_factory=list,
+        description="A list of types this type is not very effective against."
+    )
+    double_damage_to: list["NamedAPIResource"] = Field(
+        default_factory=list,
+        description="A list of types this type is very effective against."
+    )
+    no_damage_from: list["NamedAPIResource"] = Field(
+        default_factory=list,
+        description="A list of types that have no effect on this type."
+    )
+    half_damage_from: list["NamedAPIResource"] = Field(
+        default_factory=list,
+        description="A list of types that are not very effective against this type."
+    )
+    double_damage_from: list["NamedAPIResource"] = Field(
+        default_factory=list,
+        description="A list of types that are very effective against this type."
+    )
+
+
+class TypePastRelations(BaseModel):
+    generation: "NamedAPIResource" = Field(
+        description="The generation in which the referenced type had the listed damage relations."
+    )
+    damage_relations: "TypeRelations" = Field(
+        description="The damage relations the referenced type had up to and including the listed generation"
     )

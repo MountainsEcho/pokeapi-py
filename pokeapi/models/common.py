@@ -10,24 +10,48 @@ class NamedAPIResource(BaseModel):
     Attributes:
         name (str): The name of the resource.
         url (str): The URL of the resource.
+    """
+    name: str = Field(description="The name of the resource.")
+    url: str = Field(description="The URL of the resource.")
+
+
+class NamedAPIResourceList(BaseModel):
+    """
+    A generic resource with a name and URL, that will need to be queried
+    for more details.
+
+    Attributes:
+        name (str): The name of the resource.
+        url (str): The URL of the resource.
 
     Example:
         ```
         {
-            count:248,
-            next: "https://pokeapi.co/api/v2/ability/?limit=20&offset=20",
+            count: 541,
+            next: "https://pokeapi.co/api/v2/evolution-chain?offset=20&limit=20",
             previous: null,
             results: [
                 {
                     name: "stench",
-                    url: "https://pokeapi.co/api/v2/ability/1/"
+                    url: "https://pokeapi.co/api/v2/evolution-chain/1/"
                 }
             ]
         }
         ```
     """
-    name: str = Field(description="The name of the resource.")
-    url: str = Field(description="The URL of the resource.")
+    count: int = Field(
+        description="The total number of resources available from this API."
+    )
+    next: str = Field(
+        description="The URL for the next page in the list."
+    )
+    previous: str = Field(
+        description="The URL for the previous page in the list."
+    )
+    results: list["NamedAPIResource"] = Field(
+        default_factory=list,
+        description="A list of named API resources."
+    )
 
 
 class APIResource(BaseModel):
@@ -36,6 +60,19 @@ class APIResource(BaseModel):
 
     Attributes:
         url (str): The URL of the referenced resource.
+    """
+    url: str = Field(description="The URL of the referenced resource.")
+
+
+class APIResourceList(BaseModel):
+    """
+    A generic resource with a URL
+
+    Attributes:
+        count (int): The total number of resources available from this API.
+        next (str): The URL for the next page in the list.
+        previous (str): The URL for the previous page in the list.
+        results (list[APIResource]): A list of named API resources.
 
     Example:
         ```
@@ -51,7 +88,20 @@ class APIResource(BaseModel):
         }
         ```
     """
-    url: str = Field(description="The URL of the referenced resource.")
+
+    count: int = Field(
+        description="The total number of resources available from this API."
+    )
+    next: str = Field(
+        description="The URL for the next page in the list."
+    )
+    previous: str = Field(
+        description="The URL for the previous page in the list."
+    )
+    results: list["APIResource"] = Field(
+        default_factory=list,
+        description="A list of named API resources."
+    )
 
 
 class Name(BaseModel):

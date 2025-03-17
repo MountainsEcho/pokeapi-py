@@ -1,17 +1,19 @@
 from __future__ import annotations
 from pydantic import BaseModel, Field
+from typing import TYPE_CHECKING
 
-from .common import (
-    NamedAPIResource,
-    APIResource,
-    Name,
-    Description,
-    Effect,
-    VerboseEffect,
-    VersionGroupFlavorText,
-    GenerationGameIndex,
-    MachineVersionDetail,
-)
+if TYPE_CHECKING:
+    from .common import (
+        NamedAPIResource,
+        APIResource,
+        Name,
+        Description,
+        Effect,
+        VerboseEffect,
+        VersionGroupFlavorText,
+        GenerationGameIndex,
+        MachineVersionDetail,
+    )
 
 
 class Item(BaseModel):

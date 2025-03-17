@@ -1,7 +1,9 @@
 from __future__ import annotations
 from pydantic import BaseModel, Field
+from typing import TYPE_CHECKING
 
-from .common import Name
+if TYPE_CHECKING:
+    from .common import Name
 
 
 class Language(BaseModel):
@@ -13,5 +15,5 @@ class Language(BaseModel):
                         "Note that this is not Unique")
     iso3166: str = Field(description="The two-letter code of the language. "
                          "Note that this is not Unique")
-    names: list[Name] = Field(default_factory=list, description="The name of this resource "
-                              "listed in different languages.")
+    names: list["Name"] = Field(default_factory=list, description="The name of this resource "
+                                "listed in different languages.")

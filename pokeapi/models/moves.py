@@ -1,14 +1,17 @@
 from __future__ import annotations
 from pydantic import BaseModel, Field
+from typing import TYPE_CHECKING
 
-from .common import (
-    NamedAPIResource,
-    APIResource,
-    Name,
-    VerboseEffect,
-    MachineVersionDetail
-)
-from .pokemon import AbilityEffectChange
+if TYPE_CHECKING:
+    from .common import (
+        NamedAPIResource,
+        APIResource,
+        Name,
+        VerboseEffect,
+        MachineVersionDetail,
+        Description,
+    )
+    from .pokemon import AbilityEffectChange
 
 
 class Move(BaseModel):
@@ -178,4 +181,95 @@ class PastMoveStatValues(BaseModel):
     )
     version_group: "NamedAPIResource" = Field(
         description="The version group in which these move stat values were in effect."
+    )
+
+
+class MoveAilments(BaseModel):
+    """"""
+    id: int = Field(description="The identifier for this resource.")
+    name: str = Field(description="The name for this resource.")
+    moves: list["NamedAPIResource"] = Field(
+        default_factory=list,
+        description="A list of moves that cause this ailment.",
+    )
+    names: list["Name"] = Field(
+        default_factory=list,
+        description="The name of this resource listed in different languages.",
+    )
+
+
+class MoveBattleStyle(BaseModel):
+    """"""
+    id: int = Field(description="The identifier for this resource.")
+    name: str = Field(description="The name for this resource.")
+    names: list["Name"] = Field(
+        default_factory=list,
+        description="The name of this resource listed in different languages.",
+    )
+
+
+class MoveCategory(BaseModel):
+    """"""
+    id: int = Field(description="The identifier for this resource.")
+    name: str = Field(description="The name for this resource.")
+    moves: list["NamedAPIResource"] = Field(
+        default_factory=list,
+        description="A list of moves that fall into this category.",
+    )
+    descriptions: list["Description"] = Field(
+        default_factory=list,
+        description="The description of this resource listed in different languages.",
+    )
+
+
+class MoveDamageClass(BaseModel):
+    id: int = Field(description="The identifier for this resource.")
+    name: str = Field(description="The name for this resource.")
+    descriptions: list["Description"] = Field(
+        default_factory=list,
+        description="The description of this resource listed in different languages."
+    )
+    moves: list["NamedAPIResource"] = Field(
+        default_factory=list,
+        description="A list of moves that fall into this damage class."
+    )
+    names: list["Name"] = Field(
+        default_factory=list,
+        description="The name of this resource listed in different languages."
+    )
+
+
+class MoveLearnMethod(BaseModel):
+    """"""
+    id: int = Field(description="The identifier for this resource.")
+    name: str = Field(description="The name for this resource.")
+    descriptions: list["Description"] = Field(
+        default_factory=list,
+        description="The description of this resource listed in different languages.",
+    )
+    names: list["Name"] = Field(
+        default_factory=list,
+        description="The name of this resource listed in different languages."
+    )
+    version_groups: list["NamedAPIResource"] = Field(
+        default_factory=list,
+        description="A list of version groups where moves can be learned through this method.",
+    )
+
+
+class MoveLearnTarget(BaseModel):
+    """"""
+    id: int = Field(description="The identifier for this resource.")
+    name: str = Field(description="The name for this resource.")
+    descriptions: list["Description"] = Field(
+        default_factory=list,
+        description="The description of this resource listed in different languages."
+    )
+    moves: list["NamedAPIResource"] = Field(
+        default_factory=list,
+        description="A list of moves that can be learned by this target."
+    )
+    names: list["Name"] = Field(
+        default_factory=list,
+        description="The name of this resource listed in different languages."
     )

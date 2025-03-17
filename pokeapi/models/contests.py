@@ -1,8 +1,9 @@
 from __future__ import annotations
 from pydantic import BaseModel, Field
+from typing import TYPE_CHECKING
 
-from .common import NamedAPIResource, FlavorText, Effect
-from .languages import Language
+if TYPE_CHECKING:
+    from .common import NamedAPIResource, FlavorText, Effect
 
 
 class ContestType(BaseModel):
