@@ -107,12 +107,15 @@ class Api:
         else:
             raise ValueError("Either id or name must be provided")
 
+        # added this in as there is a chance that the get request will fail
+        # and if we don't get a response then
+        response = None
         try:
             response = self.session.get(url, params=params)
             # Check if the response was successful
             response.raise_for_status()
         except requests.HTTPError as e:
-            if response.status_code == 404:
+            if response is not None and response.status_code == 404:
                 logging.error(f"Berry not found: {e}")
             else:
                 logging.error(f"Error fetching data from API: {e}")

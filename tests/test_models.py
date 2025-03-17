@@ -57,7 +57,7 @@ def test_get_berry_by_id(
 )
 def test_get_all_berries(
     api: "Api",
-    limit: Optional[int],
+    limit: int,
     offset: Optional[int],
 ) -> None:
     """
