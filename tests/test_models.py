@@ -17,7 +17,7 @@ def api() -> Api:
     [
         "id",
         "name",
-        "result",
+        "expected",
     ],
     [
         (1, None, models.Berry),
